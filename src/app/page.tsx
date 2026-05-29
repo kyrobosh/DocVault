@@ -1,445 +1,360 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
+
+const PRODUCTS = [
+  { id: 1, title: "Roofing Job Estimate Spreadsheet", niche: "Roofing", icon: "🏠", price: 27, badge: "Best Seller", desc: "Auto-calculating materials, labor, and margins. Never undersell a job again.", formats: ["Excel", "Google Sheets"], gumroad: "#" },
+  { id: 2, title: "Move-In / Move-Out Checklist", niche: "Property Management", icon: "🏢", price: 19, badge: "Top Rated", desc: "Room-by-room inspection with condition ratings and signature fields.", formats: ["Word", "Google Docs"], gumroad: "#" },
+  { id: 3, title: "Wedding Photography Contract", niche: "Photography", icon: "📸", price: 37, badge: "Top Rated", desc: "9-clause contract covering payment, IP rights, cancellations, and liability.", formats: ["Word", "Google Docs"], gumroad: "#" },
+  { id: 4, title: "12-Week Program Builder", niche: "Personal Training", icon: "💪", price: 27, badge: null, desc: "3-phase training planner with client profile intake and progress tracker.", formats: ["Excel", "Google Sheets"], gumroad: "#" },
+  { id: 5, title: "Freelance Service Agreement", niche: "Legal", icon: "⚖️", price: 29, badge: null, desc: "Covers scope, payment, IP ownership, termination, and kill fee clauses.", formats: ["Word", "Google Docs"], gumroad: "#" },
+  { id: 6, title: "Monthly Cash Flow Tracker", niche: "Finance", icon: "💰", price: 24, badge: "New", desc: "Income & expense categories, monthly dashboard, break-even calculator.", formats: ["Excel", "Google Sheets"], gumroad: "#" },
+  { id: 7, title: "Employee Onboarding Checklist", niche: "HR", icon: "👥", price: 22, badge: "New", desc: "Day 1 schedule, 30-day milestones, IT setup tracker, and manager guide.", formats: ["Word", "Google Docs"], gumroad: "#" },
+  { id: 8, title: "Subcontractor Agreement", niche: "Contractors", icon: "🔧", price: 34, badge: null, desc: "Scope, payment, insurance requirements, liability, and lien waiver.", formats: ["Word", "Google Docs"], gumroad: "#" },
+  { id: 9, title: "Lease Violation Notice Pack", niche: "Property Management", icon: "🏢", price: 22, badge: null, desc: "Noise complaint, late rent, and lease breach notices — ready to print.", formats: ["Word", "Google Docs"], gumroad: "#" },
+  { id: 10, title: "PT Liability Waiver", niche: "Personal Training", icon: "💪", price: 17, badge: null, desc: "Health disclosure, risk acknowledgment, emergency contact, media consent.", formats: ["Word", "Google Docs"], gumroad: "#" },
+  { id: 11, title: "Safety Inspection Checklist", niche: "Roofing", icon: "🏠", price: 19, badge: null, desc: "Pre-job safety walkthrough covering fall protection and OSHA basics.", formats: ["Word", "Google Docs"], gumroad: "#" },
+  { id: 12, title: "Invoice & Receipt Template", niche: "Finance", icon: "💰", price: 15, badge: null, desc: "Clean branded invoice and matching receipt for any service business.", formats: ["Word", "Excel"], gumroad: "#" },
+];
+
+const CATEGORIES = ["All", "Roofing", "Property Management", "Photography", "Personal Training", "Legal", "Finance", "HR", "Contractors"];
+
+const BUNDLES = [
+  { icon: "🏠", title: "Roofing Business Kit", items: ["Job Estimate Spreadsheet", "Safety Inspection Checklist", "Subcontractor Agreement", "Invoice Template"], price: 67, original: 99, gumroad: "#" },
+  { icon: "🏢", title: "Property Manager Vault", items: ["Move-In/Out Checklist", "Lease Violation Pack", "Tenant Welcome Letter", "Maintenance Tracker"], price: 79, original: 120, gumroad: "#" },
+  { icon: "📸", title: "Photographer Starter Pack", items: ["Photography Contract", "Shot List & Questionnaire", "Invoice Template", "Model Release Form"], price: 57, original: 91, gumroad: "#" },
+  { icon: "💪", title: "Personal Trainer Pro Kit", items: ["12-Week Program Builder", "Liability Waiver", "Nutrition Tracker", "Session Notes Template"], price: 57, original: 86, gumroad: "#" },
+];
 
 export default function Home() {
+  const [category, setCategory] = useState("All");
+  const [search, setSearch] = useState("");
   const [scrollY, setScrollY] = useState(0);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const heroRef = useRef<HTMLDivElement>(null);
+  const [modal, setModal] = useState<typeof PRODUCTS[0] | null>(null);
 
   useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    const fn = () => setScrollY(window.scrollY);
+    window.addEventListener("scroll", fn, { passive: true });
+    return () => window.removeEventListener("scroll", fn);
   }, []);
 
+  const filtered = PRODUCTS.filter(p => {
+    const matchCat = category === "All" || p.niche === category;
+    const matchSearch = !search || p.title.toLowerCase().includes(search.toLowerCase()) || p.niche.toLowerCase().includes(search.toLowerCase());
+    return matchCat && matchSearch;
+  });
+
   return (
-    <main className="bg-[#080C14] text-white min-h-screen overflow-x-hidden">
-      {/* FONTS */}
+    <main style={{ fontFamily: "'DM Sans', sans-serif", background: "#FAFAF8", color: "#1a1a18", minHeight: "100vh", overflowX: "hidden" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap');
         :root {
-          --serif: 'Instrument Serif', serif;
-          --sans: 'Geist', sans-serif;
-          --blue: #2D6FE8;
-          --blue-light: #5B93FF;
-          --slate: #0F1623;
-          --border: rgba(255,255,255,0.07);
-          --muted: #6B7A99;
+          --ink: #1a1a18; --cream: #FAFAF8; --sand: #f0ebe0;
+          --gold: #c8923a; --gold-light: #e8b96a; --rust: #b84c2a;
+          --forest: #2a4a35; --muted: #7a7060; --border: #e8e0d0;
+          --white: #ffffff;
         }
-        * { font-family: var(--sans); }
-        .serif { font-family: var(--serif); }
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(32px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; } to { opacity: 1; }
-        }
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-12px); }
-        }
-        @keyframes pulse-glow {
-          0%, 100% { box-shadow: 0 0 40px rgba(45,111,232,0.15); }
-          50% { box-shadow: 0 0 80px rgba(45,111,232,0.35); }
-        }
-        @keyframes scan {
-          0% { transform: translateY(-100%); }
-          100% { transform: translateY(400%); }
-        }
-        .anim-1 { animation: fadeUp 0.7s ease both; }
-        .anim-2 { animation: fadeUp 0.7s 0.15s ease both; }
-        .anim-3 { animation: fadeUp 0.7s 0.3s ease both; }
-        .anim-4 { animation: fadeUp 0.7s 0.45s ease both; }
-        .float { animation: float 6s ease-in-out infinite; }
-        .float-delay { animation: float 6s 2s ease-in-out infinite; }
-        .glow-card { animation: pulse-glow 4s ease-in-out infinite; }
-        .gradient-text {
-          background: linear-gradient(135deg, #fff 0%, #5B93FF 50%, #fff 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-        .grid-bg {
-          background-image:
-            linear-gradient(rgba(45,111,232,0.06) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(45,111,232,0.06) 1px, transparent 1px);
-          background-size: 60px 60px;
-        }
-        .feature-card:hover { background: rgba(45,111,232,0.06); border-color: rgba(45,111,232,0.3); }
-        .feature-card { transition: all 0.3s ease; }
-        .btn-primary:hover { background: #4080FF; transform: translateY(-1px); box-shadow: 0 8px 32px rgba(45,111,232,0.4); }
-        .btn-primary { transition: all 0.2s ease; }
-        .btn-ghost:hover { background: rgba(255,255,255,0.06); }
-        .btn-ghost { transition: all 0.2s ease; }
-        .pricing-card:hover { transform: translateY(-4px); }
-        .pricing-card { transition: all 0.3s ease; }
-        .nav-blur {
-          background: rgba(8,12,20,0.8);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-        }
-        .scan-line {
-          position: absolute;
-          width: 100%;
-          height: 2px;
-          background: linear-gradient(90deg, transparent, rgba(45,111,232,0.6), transparent);
-          animation: scan 3s ease-in-out infinite;
-        }
+        .serif { font-family: 'Cormorant Garamond', serif; }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes float { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-8px); } }
+        .anim { animation: fadeUp .6s ease both; }
+        .anim-2 { animation: fadeUp .6s .12s ease both; }
+        .anim-3 { animation: fadeUp .6s .24s ease both; }
+        .anim-4 { animation: fadeUp .6s .36s ease both; }
+        .float { animation: float 5s ease-in-out infinite; }
+        .pcard:hover { transform: translateY(-4px); box-shadow: 0 20px 60px rgba(0,0,0,0.1); }
+        .pcard { transition: all .25s ease; }
+        .btn-gold:hover { background: #b07830; transform: translateY(-1px); }
+        .btn-gold { transition: all .2s ease; }
+        .pill:hover { background: var(--ink); color: #fff; }
+        .pill { transition: all .2s ease; cursor: pointer; }
+        .modal-overlay { position:fixed; inset:0; background:rgba(26,26,24,.6); z-index:999; display:flex; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(4px); }
+        .modal-box { background:#fff; border-radius:16px; width:100%; max-width:500px; overflow:hidden; animation: fadeUp .25s ease; }
+        input:focus { outline:none; border-color: var(--gold) !important; }
+        .nav-blur { background: rgba(250,250,248,.9); backdrop-filter: blur(20px); }
+        ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: var(--sand); } ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
       `}</style>
 
       {/* NAV */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 nav-blur border-b border-[var(--border)] transition-all duration-300 ${scrollY > 20 ? 'py-3' : 'py-4'}`}>
-        <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-[var(--blue)] flex items-center justify-center">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            </div>
-            <span className="font-semibold text-[15px] tracking-tight">DocVault</span>
+      <nav style={{ position:"sticky", top:0, zIndex:100, borderBottom:"1px solid var(--border)", padding:"0 48px", height:62, display:"flex", alignItems:"center", justifyContent:"space-between" }} className="nav-blur">
+        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+          <div style={{ width:32, height:32, borderRadius:8, background:"var(--ink)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c8923a" strokeWidth="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
           </div>
-
-          <div className="hidden md:flex items-center gap-8">
-            {['Features', 'Security', 'Pricing', 'Docs'].map(item => (
-              <a key={item} href={`#${item.toLowerCase()}`} className="text-[13px] text-[var(--muted)] hover:text-white transition-colors">{item}</a>
-            ))}
-          </div>
-
-          <div className="hidden md:flex items-center gap-3">
-            <a href="/login" className="btn-ghost text-[13px] px-4 py-2 rounded-lg text-[var(--muted)] hover:text-white">Sign in</a>
-            <a href="/register" className="btn-primary bg-[var(--blue)] text-[13px] px-4 py-2 rounded-lg font-medium">Get started free</a>
-          </div>
-
-          <button className="md:hidden p-2" onClick={() => setMenuOpen(!menuOpen)}>
-            <div className="w-5 h-0.5 bg-white mb-1"></div>
-            <div className="w-5 h-0.5 bg-white mb-1"></div>
-            <div className="w-5 h-0.5 bg-white"></div>
-          </button>
+          <span style={{ fontSize:18, fontWeight:700, letterSpacing:"-0.3px" }}>Doc<span style={{ color:"var(--gold)" }}>Vault</span></span>
         </div>
-
-        {menuOpen && (
-          <div className="md:hidden border-t border-[var(--border)] px-6 py-4 flex flex-col gap-4">
-            {['Features', 'Security', 'Pricing', 'Docs'].map(item => (
-              <a key={item} href={`#${item.toLowerCase()}`} className="text-[14px] text-[var(--muted)]">{item}</a>
-            ))}
-            <a href="/register" className="btn-primary bg-[var(--blue)] text-[13px] px-4 py-2.5 rounded-lg font-medium text-center">Get started free</a>
-          </div>
-        )}
+        <div style={{ display:"flex", alignItems:"center", gap:32 }}>
+          {["Templates", "Bundles", "Pricing"].map(l => (
+            <a key={l} href={`#${l.toLowerCase()}`} style={{ fontSize:13, fontWeight:500, color:"var(--muted)", textDecoration:"none", letterSpacing:".3px" }}
+              onMouseEnter={e => (e.currentTarget.style.color = "var(--ink)")} onMouseLeave={e => (e.currentTarget.style.color = "var(--muted)")}>{l}</a>
+          ))}
+        </div>
+        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+          <Link href="/login" style={{ fontSize:13, color:"var(--muted)", textDecoration:"none", padding:"8px 16px", borderRadius:6 }}
+            onMouseEnter={e => (e.currentTarget.style.color = "var(--ink)")} onMouseLeave={e => (e.currentTarget.style.color = "var(--muted)")}>Sign in</Link>
+          <Link href="/register" className="btn-gold" style={{ fontSize:13, fontWeight:600, color:"#fff", background:"var(--gold)", padding:"9px 18px", borderRadius:6, textDecoration:"none" }}>Get full access</Link>
+        </div>
       </nav>
 
       {/* HERO */}
-      <section ref={heroRef} className="relative min-h-screen flex items-center grid-bg pt-20">
-        {/* Glow orbs */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-[var(--blue)] opacity-[0.07] blur-[120px] pointer-events-none" />
-        <div className="absolute top-1/3 left-1/4 w-[300px] h-[300px] rounded-full bg-[#5B93FF] opacity-[0.05] blur-[80px] pointer-events-none" />
-
-        <div className="max-w-6xl mx-auto px-6 py-24 grid md:grid-cols-2 gap-16 items-center w-full">
-          <div>
-            <div className="anim-1 inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[var(--blue)] border-opacity-40 bg-[rgba(45,111,232,0.08)] mb-8">
-              <div className="w-1.5 h-1.5 rounded-full bg-[var(--blue-light)] animate-pulse" />
-              <span className="text-[12px] text-[var(--blue-light)] font-medium tracking-wide">HIPAA-conscious · Enterprise-ready</span>
-            </div>
-
-            <h1 className="anim-2 serif text-[52px] md:text-[64px] leading-[1.05] mb-6">
-              Documents your team can{" "}
-              <span className="gradient-text italic">trust with anything.</span>
-            </h1>
-
-            <p className="anim-3 text-[16px] text-[var(--muted)] leading-relaxed mb-10 max-w-lg">
-              Secure document management with AI-powered intelligence. Upload, organize, share, and extract insights from any file — with enterprise-grade security built in.
-            </p>
-
-            <div className="anim-4 flex flex-col sm:flex-row gap-3">
-              <a href="/register" className="btn-primary bg-[var(--blue)] px-6 py-3 rounded-xl font-medium text-[14px] text-center">
-                Start free — no credit card
-              </a>
-              <a href="#features" className="btn-ghost border border-[var(--border)] px-6 py-3 rounded-xl text-[14px] text-[var(--muted)] hover:text-white text-center">
-                See how it works →
-              </a>
-            </div>
-
-            <div className="anim-4 flex items-center gap-6 mt-10">
-              {[['10k+', 'Documents processed'], ['99.9%', 'Uptime SLA'], ['SOC2', 'Compliant']].map(([n, l]) => (
-                <div key={n}>
-                  <div className="text-[18px] font-semibold text-white">{n}</div>
-                  <div className="text-[11px] text-[var(--muted)]">{l}</div>
-                </div>
-              ))}
-            </div>
+      <section style={{ maxWidth:1200, margin:"0 auto", padding:"100px 48px 80px", display:"grid", gridTemplateColumns:"1fr 400px", gap:80, alignItems:"center" }}>
+        <div>
+          <div className="anim" style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"5px 14px", borderRadius:999, border:"1px solid var(--gold)", background:"rgba(200,146,58,.08)", marginBottom:24 }}>
+            <div style={{ width:6, height:6, borderRadius:"50%", background:"var(--gold)" }} />
+            <span style={{ fontSize:11, fontWeight:600, letterSpacing:"2px", textTransform:"uppercase", color:"var(--gold)" }}>250+ Templates · Instant Download</span>
           </div>
-
-          {/* Hero visual */}
-          <div className="relative hidden md:block">
-            <div className="float glow-card relative bg-[var(--slate)] border border-[var(--border)] rounded-2xl p-6 shadow-2xl overflow-hidden">
-              <div className="scan-line" />
-
-              {/* Mock file list */}
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <div className="text-[13px] font-medium mb-0.5">My Documents</div>
-                  <div className="text-[11px] text-[var(--muted)]">4 files · 2.3 GB used</div>
-                </div>
-                <div className="bg-[var(--blue)] text-[11px] px-3 py-1.5 rounded-lg font-medium">+ Upload</div>
-              </div>
-
-              {[
-                { name: 'Q4_Financial_Report.pdf', size: '2.4 MB', type: 'PDF', color: '#E84040', ai: true },
-                { name: 'Patient_Records_2024.xlsx', size: '890 KB', type: 'XLS', color: '#40B874', ai: false },
-                { name: 'NDA_Template_v3.docx', size: '124 KB', type: 'DOC', color: '#2D6FE8', ai: true },
-                { name: 'Radiology_Scan_001.tiff', size: '14.2 MB', type: 'IMG', color: '#9B59B6', ai: false },
-              ].map((file, i) => (
-                <div key={i} className={`flex items-center gap-3 p-3 rounded-xl mb-2 ${i === 0 ? 'bg-[rgba(45,111,232,0.12)] border border-[rgba(45,111,232,0.2)]' : 'hover:bg-white/5'} transition-all cursor-pointer`}>
-                  <div className="w-9 h-9 rounded-lg flex items-center justify-center text-[10px] font-bold flex-shrink-0" style={{ background: `${file.color}20`, color: file.color }}>
-                    {file.type}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-[12px] font-medium truncate">{file.name}</div>
-                    <div className="text-[10px] text-[var(--muted)]">{file.size}</div>
-                  </div>
-                  {file.ai && (
-                    <div className="flex items-center gap-1 bg-[rgba(91,147,255,0.15)] px-2 py-0.5 rounded-full">
-                      <div className="w-1.5 h-1.5 rounded-full bg-[var(--blue-light)]" />
-                      <span className="text-[9px] text-[var(--blue-light)]">AI</span>
-                    </div>
-                  )}
-                </div>
-              ))}
-
-              {/* AI summary preview */}
-              <div className="mt-4 p-3 bg-[rgba(45,111,232,0.08)] border border-[rgba(45,111,232,0.15)] rounded-xl">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-4 h-4 rounded bg-[var(--blue)] flex items-center justify-center">
-                    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                  </div>
-                  <span className="text-[11px] text-[var(--blue-light)] font-medium">AI Summary</span>
-                </div>
-                <p className="text-[11px] text-[var(--muted)] leading-relaxed">Revenue increased 23% YoY. Key risks identified in sections 4.2 and 7. Requires CFO signature by Dec 31.</p>
-              </div>
-            </div>
-
-            {/* Floating badge */}
-            <div className="float-delay absolute -bottom-4 -left-8 bg-[var(--slate)] border border-[var(--border)] rounded-xl px-4 py-3 shadow-xl">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-[rgba(40,184,116,0.15)] flex items-center justify-center">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#40B874" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                </div>
-                <div>
-                  <div className="text-[11px] font-medium">End-to-end encrypted</div>
-                  <div className="text-[10px] text-[var(--muted)]">AES-256 at rest</div>
-                </div>
-              </div>
-            </div>
+          <h1 className="anim-2 serif" style={{ fontSize:"clamp(44px,5vw,72px)", fontWeight:700, lineHeight:1.05, marginBottom:20 }}>
+            Every document your<br /><em style={{ color:"var(--gold)" }}>business needs.</em>
+          </h1>
+          <p className="anim-3" style={{ fontSize:16, lineHeight:1.75, color:"var(--muted)", maxWidth:460, marginBottom:36 }}>
+            Professional templates for contractors, property managers, photographers, trainers, and more. Download instantly and customize in minutes.
+          </p>
+          <div className="anim-4" style={{ display:"flex", gap:12, flexWrap:"wrap", marginBottom:40 }}>
+            <a href="#templates" className="btn-gold" style={{ background:"var(--ink)", color:"#fff", padding:"14px 28px", borderRadius:8, fontSize:14, fontWeight:600, textDecoration:"none" }}>Browse Templates</a>
+            <a href="#pricing" style={{ background:"transparent", color:"var(--ink)", padding:"14px 28px", borderRadius:8, fontSize:14, fontWeight:500, textDecoration:"none", border:"1.5px solid var(--border)" }}
+              onMouseEnter={e => (e.currentTarget.style.background = "var(--sand)")} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>View pricing →</a>
           </div>
-        </div>
-      </section>
-
-      {/* LOGOS */}
-      <section className="border-y border-[var(--border)] py-10">
-        <div className="max-w-5xl mx-auto px-6">
-          <p className="text-center text-[12px] text-[var(--muted)] mb-8 tracking-widest uppercase">Trusted by teams at</p>
-          <div className="flex flex-wrap justify-center items-center gap-10 opacity-40">
-            {['Acme Health', 'Meridian Law', 'Blackrock Legal', 'Northstar Clinic', 'Atlas Finance'].map(name => (
-              <span key={name} className="text-[14px] font-medium text-white tracking-tight">{name}</span>
+          <div className="anim-4" style={{ display:"flex", gap:40 }}>
+            {[["250+","Templates"], ["18","Industries"], ["Instant","Download"], ["Free","Updates"]].map(([n,l]) => (
+              <div key={n}>
+                <div className="serif" style={{ fontSize:26, fontWeight:700, color:"var(--ink)" }}>{n}</div>
+                <div style={{ fontSize:11, color:"var(--muted)", marginTop:2 }}>{l}</div>
+              </div>
             ))}
           </div>
         </div>
+
+        {/* Hero visual */}
+        <div className="float" style={{ background:"#fff", borderRadius:16, padding:24, boxShadow:"0 20px 80px rgba(0,0,0,0.1)", border:"1px solid var(--border)" }}>
+          <div style={{ fontSize:12, fontWeight:600, color:"var(--muted)", marginBottom:16, letterSpacing:"1px", textTransform:"uppercase" }}>Popular This Week</div>
+          {PRODUCTS.slice(0,5).map((p,i) => (
+            <div key={i} style={{ display:"flex", alignItems:"center", gap:12, padding:"10px 0", borderBottom: i < 4 ? "1px solid var(--border)" : "none" }}>
+              <div style={{ width:36, height:36, borderRadius:8, background:"var(--sand)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, flexShrink:0 }}>{p.icon}</div>
+              <div style={{ flex:1, minWidth:0 }}>
+                <div style={{ fontSize:12, fontWeight:600, marginBottom:2, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{p.title}</div>
+                <div style={{ fontSize:10, color:"var(--muted)" }}>{p.niche}</div>
+              </div>
+              <div className="serif" style={{ fontSize:18, fontWeight:700, color:"var(--gold)", flexShrink:0 }}>${p.price}</div>
+            </div>
+          ))}
+          <div style={{ marginTop:16, padding:"12px 16px", background:"var(--sand)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <div>
+              <div style={{ fontSize:12, fontWeight:600 }}>Full Access Pass</div>
+              <div style={{ fontSize:10, color:"var(--muted)" }}>All 250+ templates</div>
+            </div>
+            <div className="serif" style={{ fontSize:20, fontWeight:700, color:"var(--rust)" }}>$29<span style={{ fontSize:11, color:"var(--muted)" }}>/mo</span></div>
+          </div>
+        </div>
       </section>
 
-      {/* FEATURES */}
-      <section id="features" className="py-28 max-w-6xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[var(--border)] text-[11px] text-[var(--muted)] mb-5 tracking-widest uppercase">Features</div>
-          <h2 className="serif text-[42px] md:text-[52px] leading-tight mb-4">
-            Everything your team needs.<br />
-            <span className="gradient-text italic">Nothing you don't.</span>
-          </h2>
-          <p className="text-[var(--muted)] text-[16px] max-w-xl mx-auto">Built for healthcare, legal, and finance teams who can't afford to compromise on security or efficiency.</p>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-5">
-          {[
-            { icon: '⬆️', title: 'Smart Upload', desc: 'Drag & drop any file type. Bulk uploads, folder organization, automatic versioning, and instant preview generation.' },
-            { icon: '🔒', title: 'Zero-Trust Security', desc: 'End-to-end encryption, signed URLs, audit logging, role-based access, and session management out of the box.' },
-            { icon: '🤖', title: 'AI Document Intelligence', desc: 'Automatic summaries, key data extraction, smart tagging, and natural language search across all your documents.' },
-            { icon: '👥', title: 'Team Collaboration', desc: 'Multi-tenant organizations, role-based permissions, secure sharing links, email invites, and download tracking.' },
-            { icon: '🔍', title: 'Full-Text OCR Search', desc: 'Every document is indexed and searchable. Find anything in seconds with AI-powered semantic search.' },
-            { icon: '📊', title: 'Analytics & Audit', desc: 'Complete audit trail of every action. Storage analytics, AI usage tracking, and compliance-ready reporting.' },
-          ].map((f, i) => (
-            <div key={i} className="feature-card border border-[var(--border)] rounded-2xl p-6 bg-[rgba(255,255,255,0.01)]">
-              <div className="text-3xl mb-4">{f.icon}</div>
-              <h3 className="text-[15px] font-semibold mb-2">{f.title}</h3>
-              <p className="text-[13px] text-[var(--muted)] leading-relaxed">{f.desc}</p>
+      {/* STATS BAR */}
+      <div style={{ background:"var(--ink)", padding:"20px 48px" }}>
+        <div style={{ maxWidth:1200, margin:"0 auto", display:"flex", gap:48, justifyContent:"center", flexWrap:"wrap" }}>
+          {[["4,800+","Businesses served"], ["⭐ 4.9","Average rating"], ["250+","Ready-to-use templates"], ["Instant","Delivery after payment"]].map(([n,l]) => (
+            <div key={n} style={{ textAlign:"center", color:"#fff" }}>
+              <div className="serif" style={{ fontSize:24, fontWeight:700, color:"var(--gold)" }}>{n}</div>
+              <div style={{ fontSize:11, color:"rgba(255,255,255,.5)", marginTop:2 }}>{l}</div>
             </div>
           ))}
         </div>
-      </section>
+      </div>
 
-      {/* SECURITY SECTION */}
-      <section id="security" className="py-24 border-y border-[var(--border)] bg-[var(--slate)]">
-        <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[var(--border)] text-[11px] text-[var(--muted)] mb-6 tracking-widest uppercase">Security</div>
-            <h2 className="serif text-[40px] leading-tight mb-6">Built for the most<br /><span className="gradient-text italic">sensitive documents.</span></h2>
-            <p className="text-[15px] text-[var(--muted)] leading-relaxed mb-8">DocVault is architected with HIPAA-conscious patterns from day one — not bolted on after. Your documents are protected at every layer.</p>
-            <div className="space-y-4">
-              {[
-                ['AES-256 Encryption', 'All files encrypted at rest and in transit'],
-                ['Signed URLs', 'Time-limited, user-specific access links'],
-                ['Full Audit Trail', 'Every action logged with IP and timestamp'],
-                ['Role-Based Access', 'Granular permissions per user and team'],
-                ['MFA Support', 'Multi-factor authentication ready'],
-                ['Rate Limiting', 'API abuse protection built in'],
-              ].map(([title, desc]) => (
-                <div key={title} className="flex items-start gap-3">
-                  <div className="w-5 h-5 rounded-full bg-[rgba(40,184,116,0.15)] flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#40B874" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
-                  </div>
-                  <div>
-                    <div className="text-[13px] font-medium">{title}</div>
-                    <div className="text-[12px] text-[var(--muted)]">{desc}</div>
-                  </div>
-                </div>
-              ))}
+      {/* TEMPLATES */}
+      <section id="templates" style={{ maxWidth:1200, margin:"0 auto", padding:"80px 48px" }}>
+        <div style={{ marginBottom:40 }}>
+          <div style={{ display:"inline-block", fontSize:11, fontWeight:600, letterSpacing:"2px", textTransform:"uppercase", color:"var(--gold)", border:"1px solid var(--gold)", padding:"4px 12px", borderRadius:2, marginBottom:16 }}>Templates</div>
+          <div style={{ display:"flex", alignItems:"flex-end", justifyContent:"space-between", marginBottom:24 }}>
+            <h2 className="serif" style={{ fontSize:"clamp(32px,3vw,44px)", fontWeight:700, lineHeight:1.1 }}>Browse all templates</h2>
+            <div style={{ display:"flex", gap:0, border:"1.5px solid var(--border)", borderRadius:8, overflow:"hidden", background:"#fff", flexShrink:0 }}>
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search templates…" style={{ padding:"10px 16px", border:"none", fontSize:13, width:240, fontFamily:"'DM Sans',sans-serif", background:"transparent" }} />
+              <button style={{ background:"var(--ink)", color:"#fff", border:"none", padding:"10px 16px", fontSize:13, fontWeight:600, cursor:"pointer" }}>Search</button>
             </div>
           </div>
-
-          <div className="relative">
-            <div className="bg-[#080C14] border border-[var(--border)] rounded-2xl p-6 font-mono text-[12px]">
-              <div className="flex items-center gap-2 mb-5">
-                <div className="w-3 h-3 rounded-full bg-[#FF5F56]" />
-                <div className="w-3 h-3 rounded-full bg-[#FFBD2E]" />
-                <div className="w-3 h-3 rounded-full bg-[#27C93F]" />
-                <span className="text-[var(--muted)] ml-2 text-[11px]">audit_log.json</span>
+          <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
+            {CATEGORIES.map(c => (
+              <div key={c} className="pill" onClick={() => setCategory(c)}
+                style={{ padding:"6px 14px", borderRadius:999, fontSize:12, fontWeight:500, border:"1.5px solid var(--border)", background: category === c ? "var(--ink)" : "#fff", color: category === c ? "#fff" : "var(--muted)" }}>
+                {c}
               </div>
-              {[
-                { action: 'FILE_UPLOADED', user: 'dr.chen@clinic.com', time: '2s ago', color: '#40B874' },
-                { action: 'FILE_SHARED', user: 'admin@clinic.com', time: '1m ago', color: '#2D6FE8' },
-                { action: 'FILE_VIEWED', user: 'jane.smith@clinic.com', time: '3m ago', color: '#5B93FF' },
-                { action: 'SHARE_ACCESSED', user: 'external@partner.com', time: '5m ago', color: '#F39C12' },
-                { action: 'AI_QUERY', user: 'dr.chen@clinic.com', time: '8m ago', color: '#9B59B6' },
-              ].map((log, i) => (
-                <div key={i} className="flex items-center gap-3 py-2 border-b border-[var(--border)] last:border-0">
-                  <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: log.color }} />
-                  <span style={{ color: log.color }} className="flex-shrink-0">{log.action}</span>
-                  <span className="text-[var(--muted)] truncate flex-1">{log.user}</span>
-                  <span className="text-[var(--muted)] flex-shrink-0 text-[10px]">{log.time}</span>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(270px,1fr))", gap:20 }}>
+          {filtered.map(p => (
+            <div key={p.id} className="pcard" onClick={() => setModal(p)}
+              style={{ background:"#fff", borderRadius:12, overflow:"hidden", border:"1px solid var(--border)", cursor:"pointer" }}>
+              <div style={{ height:120, background:"var(--sand)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:48, position:"relative" }}>
+                {p.icon}
+                {p.badge && <div style={{ position:"absolute", top:10, right:10, background: p.badge === "New" ? "var(--forest)" : "var(--gold)", color:"#fff", fontSize:9, fontWeight:700, letterSpacing:"1px", textTransform:"uppercase", padding:"3px 7px", borderRadius:2 }}>{p.badge}</div>}
+              </div>
+              <div style={{ padding:18 }}>
+                <div style={{ fontSize:10, fontWeight:700, letterSpacing:"2px", textTransform:"uppercase", color:"var(--muted)", marginBottom:6 }}>{p.niche}</div>
+                <div className="serif" style={{ fontSize:17, fontWeight:700, marginBottom:6, lineHeight:1.3 }}>{p.title}</div>
+                <div style={{ fontSize:12, color:"var(--muted)", lineHeight:1.5, marginBottom:14 }}>{p.desc}</div>
+                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+                  <div>
+                    <div className="serif" style={{ fontSize:24, fontWeight:700 }}>${p.price}</div>
+                    <div style={{ fontSize:10, color:"var(--muted)" }}>{p.formats.join(" · ")}</div>
+                  </div>
+                  <button className="btn-gold" style={{ background:"var(--ink)", color:"#fff", border:"none", padding:"8px 16px", borderRadius:6, fontSize:12, fontWeight:600, cursor:"pointer" }}>View →</button>
                 </div>
-              ))}
+              </div>
             </div>
+          ))}
+        </div>
+
+        {filtered.length === 0 && (
+          <div style={{ textAlign:"center", padding:"60px 20px", color:"var(--muted)" }}>
+            <div style={{ fontSize:40, marginBottom:12 }}>🔍</div>
+            <div style={{ fontSize:16, fontWeight:600, color:"var(--ink)", marginBottom:4 }}>No templates found</div>
+            <div style={{ fontSize:13 }}>Try a different search or category</div>
+          </div>
+        )}
+      </section>
+
+      {/* BUNDLES */}
+      <section id="bundles" style={{ background:"var(--ink)", padding:"80px 48px" }}>
+        <div style={{ maxWidth:1200, margin:"0 auto" }}>
+          <div style={{ marginBottom:48, textAlign:"center" }}>
+            <div style={{ display:"inline-block", fontSize:11, fontWeight:600, letterSpacing:"2px", textTransform:"uppercase", color:"var(--gold)", border:"1px solid rgba(200,146,58,.4)", padding:"4px 12px", borderRadius:2, marginBottom:16 }}>Bundles</div>
+            <h2 className="serif" style={{ fontSize:"clamp(32px,3vw,44px)", fontWeight:700, color:"#fff", marginBottom:8 }}>Industry starter kits</h2>
+            <p style={{ fontSize:15, color:"rgba(255,255,255,.5)" }}>Everything your trade needs — deeply discounted.</p>
+          </div>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))", gap:18 }}>
+            {BUNDLES.map(b => (
+              <div key={b.title} style={{ background:"rgba(255,255,255,.04)", border:"1px solid rgba(200,146,58,.2)", borderRadius:12, padding:26, transition:"all .25s ease", cursor:"pointer" }}
+                onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor = "var(--gold)"; (e.currentTarget as HTMLDivElement).style.background = "rgba(200,146,58,.07)"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(200,146,58,.2)"; (e.currentTarget as HTMLDivElement).style.background = "rgba(255,255,255,.04)"; }}>
+                <div style={{ fontSize:32, marginBottom:14 }}>{b.icon}</div>
+                <div className="serif" style={{ fontSize:20, fontWeight:700, color:"#fff", marginBottom:6 }}>{b.title}</div>
+                <ul style={{ listStyle:"none", padding:0, marginBottom:20 }}>
+                  {b.items.map(item => (
+                    <li key={item} style={{ fontSize:12, color:"rgba(255,255,255,.6)", padding:"3px 0", display:"flex", alignItems:"center", gap:6 }}>
+                      <span style={{ color:"var(--gold)", fontWeight:700 }}>✓</span>{item}
+                    </li>
+                  ))}
+                </ul>
+                <div style={{ display:"flex", alignItems:"baseline", gap:8, marginBottom:16 }}>
+                  <span className="serif" style={{ fontSize:28, fontWeight:700, color:"var(--gold)" }}>${b.price}</span>
+                  <span style={{ fontSize:13, color:"rgba(255,255,255,.4)", textDecoration:"line-through" }}>${b.original}</span>
+                  <span style={{ fontSize:10, background:"var(--rust)", color:"#fff", padding:"2px 6px", borderRadius:2, fontWeight:700 }}>SAVE {Math.round((1-b.price/b.original)*100)}%</span>
+                </div>
+                <a href={b.gumroad} style={{ display:"block", textAlign:"center", background:"rgba(200,146,58,.15)", color:"var(--gold)", border:"1px solid rgba(200,146,58,.3)", padding:"10px", borderRadius:6, fontSize:13, fontWeight:600, textDecoration:"none", transition:"all .2s ease" }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.background = "var(--gold)"; (e.currentTarget as HTMLAnchorElement).style.color = "var(--ink)"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.background = "rgba(200,146,58,.15)"; (e.currentTarget as HTMLAnchorElement).style.color = "var(--gold)"; }}>
+                  Get this bundle →
+                </a>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* PRICING */}
-      <section id="pricing" className="py-28 max-w-6xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[var(--border)] text-[11px] text-[var(--muted)] mb-5 tracking-widest uppercase">Pricing</div>
-          <h2 className="serif text-[42px] leading-tight mb-4">Simple, transparent pricing.</h2>
-          <p className="text-[var(--muted)] text-[16px]">14-day free trial. No credit card required.</p>
+      <section id="pricing" style={{ maxWidth:1200, margin:"0 auto", padding:"80px 48px" }}>
+        <div style={{ textAlign:"center", marginBottom:48 }}>
+          <div style={{ display:"inline-block", fontSize:11, fontWeight:600, letterSpacing:"2px", textTransform:"uppercase", color:"var(--gold)", border:"1px solid var(--gold)", padding:"4px 12px", borderRadius:2, marginBottom:16 }}>Pricing</div>
+          <h2 className="serif" style={{ fontSize:"clamp(32px,3vw,44px)", fontWeight:700, marginBottom:8 }}>Simple, transparent pricing</h2>
+          <p style={{ fontSize:15, color:"var(--muted)" }}>Buy one template or unlock everything.</p>
         </div>
-
-        <div className="grid md:grid-cols-3 gap-6">
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:20, maxWidth:900, margin:"0 auto" }}>
           {[
-            {
-              name: 'Free', price: '$0', period: 'forever',
-              desc: 'For individuals getting started.',
-              features: ['5 GB storage', '3 team members', '10 AI requests/mo', 'Basic sharing', 'PDF preview'],
-              cta: 'Get started free', highlight: false,
-            },
-            {
-              name: 'Pro', price: '$29', period: 'per month',
-              desc: 'For growing teams and practices.',
-              features: ['100 GB storage', '25 team members', '500 AI requests/mo', 'Advanced sharing', 'OCR indexing', 'Priority support', 'Audit logs'],
-              cta: 'Start free trial', highlight: true,
-            },
-            {
-              name: 'Enterprise', price: 'Custom', period: 'contact us',
-              desc: 'For large organizations with compliance needs.',
-              features: ['1 TB+ storage', 'Unlimited members', '10,000+ AI requests', 'HIPAA BAA', 'SSO / SAML', 'Dedicated support', 'SLA guarantee'],
-              cta: 'Contact sales', highlight: false,
-            },
-          ].map((plan) => (
-            <div key={plan.name} className={`pricing-card rounded-2xl p-7 border ${plan.highlight ? 'border-[var(--blue)] bg-[rgba(45,111,232,0.06)]' : 'border-[var(--border)] bg-[rgba(255,255,255,0.01)]'} relative`}>
-              {plan.highlight && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[var(--blue)] text-[11px] font-semibold px-3 py-1 rounded-full">Most Popular</div>
-              )}
-              <div className="text-[13px] text-[var(--muted)] mb-1">{plan.name}</div>
-              <div className="flex items-baseline gap-1 mb-1">
-                <span className="serif text-[42px] leading-none">{plan.price}</span>
-                <span className="text-[12px] text-[var(--muted)]">/{plan.period}</span>
+            { name:"Pay Per Template", price:"$15–37", period:"per template", desc:"Buy exactly what you need.", features:["Instant download","Editable in Word/Excel","Free updates forever","Use across your business"], cta:"Browse templates", href:"#templates", highlight:false },
+            { name:"Full Access Pass", price:"$29", period:"per month", desc:"Unlimited access to everything.", features:["All 250+ templates","New templates monthly","Cancel anytime","Priority support","Commercial use license"], cta:"Get full access", href:"/register", highlight:true },
+            { name:"Lifetime Deal", price:"$149", period:"one time", desc:"Pay once, own it forever.", features:["All 250+ templates","All future templates","No subscription","Commercial use license","Priority support"], cta:"Get lifetime access", href:"/register", highlight:false },
+          ].map(plan => (
+            <div key={plan.name} style={{ borderRadius:12, padding:28, border: plan.highlight ? "2px solid var(--gold)" : "1px solid var(--border)", background: plan.highlight ? "rgba(200,146,58,.04)" : "#fff", position:"relative", transition:"all .25s ease" }}>
+              {plan.highlight && <div style={{ position:"absolute", top:-12, left:"50%", transform:"translateX(-50%)", background:"var(--gold)", color:"#fff", fontSize:10, fontWeight:700, padding:"4px 12px", borderRadius:999, whiteSpace:"nowrap" }}>Most Popular</div>}
+              <div style={{ fontSize:12, color:"var(--muted)", marginBottom:4 }}>{plan.name}</div>
+              <div style={{ display:"flex", alignItems:"baseline", gap:4, marginBottom:4 }}>
+                <span className="serif" style={{ fontSize:36, fontWeight:700 }}>{plan.price}</span>
+                <span style={{ fontSize:11, color:"var(--muted)" }}>/{plan.period}</span>
               </div>
-              <p className="text-[13px] text-[var(--muted)] mb-6">{plan.desc}</p>
-              <a href="/register" className={`block text-center py-2.5 rounded-xl text-[13px] font-medium mb-6 transition-all ${plan.highlight ? 'btn-primary bg-[var(--blue)]' : 'btn-ghost border border-[var(--border)] hover:border-[var(--blue)] hover:text-[var(--blue-light)]'}`}>
-                {plan.cta}
-              </a>
-              <div className="space-y-3">
-                {plan.features.map(f => (
-                  <div key={f} className="flex items-center gap-2 text-[13px]">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={plan.highlight ? '#5B93FF' : '#40B874'} strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                    <span className="text-[var(--muted)]">{f}</span>
-                  </div>
-                ))}
-              </div>
+              <div style={{ fontSize:13, color:"var(--muted)", marginBottom:20 }}>{plan.desc}</div>
+              <Link href={plan.href} className="btn-gold" style={{ display:"block", textAlign:"center", background: plan.highlight ? "var(--gold)" : "var(--ink)", color:"#fff", padding:"11px", borderRadius:6, fontSize:13, fontWeight:600, textDecoration:"none", marginBottom:20 }}>{plan.cta}</Link>
+              {plan.features.map(f => (
+                <div key={f} style={{ display:"flex", alignItems:"center", gap:8, fontSize:13, padding:"4px 0" }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={plan.highlight ? "var(--gold)" : "var(--forest)"} strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span style={{ color:"var(--muted)" }}>{f}</span>
+                </div>
+              ))}
             </div>
           ))}
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-24 relative overflow-hidden">
-        <div className="absolute inset-0 grid-bg opacity-50" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-[var(--blue)] opacity-[0.08] blur-[100px] rounded-full" />
-        <div className="relative max-w-3xl mx-auto px-6 text-center">
-          <h2 className="serif text-[48px] leading-tight mb-5">
-            Ready to take control<br />
-            <span className="gradient-text italic">of your documents?</span>
-          </h2>
-          <p className="text-[16px] text-[var(--muted)] mb-10">Join thousands of teams who trust DocVault with their most sensitive files.</p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a href="/register" className="btn-primary bg-[var(--blue)] px-8 py-3.5 rounded-xl font-medium text-[14px]">
-              Start free trial
-            </a>
-            <a href="#pricing" className="btn-ghost border border-[var(--border)] px-8 py-3.5 rounded-xl text-[14px] text-[var(--muted)] hover:text-white">
-              View pricing
-            </a>
-          </div>
-          <p className="text-[12px] text-[var(--muted)] mt-5">No credit card required · 14-day free trial · Cancel anytime</p>
+      <section style={{ background:"var(--sand)", padding:"72px 48px", textAlign:"center" }}>
+        <h2 className="serif" style={{ fontSize:"clamp(32px,3vw,48px)", fontWeight:700, marginBottom:12 }}>
+          Ready to stop starting<br /><em style={{ color:"var(--gold)" }}>from scratch?</em>
+        </h2>
+        <p style={{ fontSize:15, color:"var(--muted)", marginBottom:32 }}>Join thousands of business owners who save hours every week with DocVault templates.</p>
+        <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap" }}>
+          <Link href="/register" className="btn-gold" style={{ background:"var(--ink)", color:"#fff", padding:"14px 32px", borderRadius:8, fontSize:14, fontWeight:600, textDecoration:"none" }}>Get full access — $29/mo</Link>
+          <a href="#templates" style={{ background:"#fff", color:"var(--ink)", padding:"14px 32px", borderRadius:8, fontSize:14, fontWeight:500, textDecoration:"none", border:"1.5px solid var(--border)" }}>Browse free first</a>
         </div>
+        <p style={{ fontSize:11, color:"var(--muted)", marginTop:16 }}>No credit card required to browse · Cancel anytime</p>
       </section>
 
       {/* FOOTER */}
-      <footer className="border-t border-[var(--border)] py-14">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="grid md:grid-cols-5 gap-10 mb-12">
-            <div className="md:col-span-2">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-7 h-7 rounded-lg bg-[var(--blue)] flex items-center justify-center">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                </div>
-                <span className="font-semibold text-[15px]">DocVault</span>
-              </div>
-              <p className="text-[13px] text-[var(--muted)] leading-relaxed max-w-xs">Secure document management with AI intelligence for healthcare, legal, and finance teams.</p>
+      <footer style={{ background:"var(--ink)", padding:"48px 48px 28px" }}>
+        <div style={{ maxWidth:1200, margin:"0 auto" }}>
+          <div style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr", gap:40, marginBottom:40 }}>
+            <div>
+              <div style={{ fontSize:20, fontWeight:700, color:"#fff", marginBottom:12 }}>Doc<span style={{ color:"var(--gold)" }}>Vault</span></div>
+              <p style={{ fontSize:12, color:"rgba(255,255,255,.4)", lineHeight:1.7, maxWidth:240 }}>Professional business templates for every trade and industry. Download once, use forever.</p>
             </div>
             {[
-              { title: 'Product', links: ['Features', 'Security', 'Pricing', 'Changelog'] },
-              { title: 'Company', links: ['About', 'Blog', 'Careers', 'Contact'] },
-              { title: 'Legal', links: ['Privacy', 'Terms', 'HIPAA', 'Security'] },
+              { title:"Industries", links:["Roofing","Property Mgmt","Photography","Fitness","Construction"] },
+              { title:"Templates", links:["Contracts","Estimates","Checklists","Spreadsheets","HR Forms"] },
+              { title:"Company", links:["About","Refund Policy","Terms of Use","Privacy Policy","Contact"] },
             ].map(col => (
               <div key={col.title}>
-                <h4 className="text-[12px] font-semibold mb-4 tracking-widest uppercase text-[var(--muted)]">{col.title}</h4>
-                <div className="space-y-3">
-                  {col.links.map(link => (
-                    <a key={link} href="#" className="block text-[13px] text-[var(--muted)] hover:text-white transition-colors">{link}</a>
-                  ))}
-                </div>
+                <div style={{ fontSize:10, fontWeight:700, letterSpacing:"2px", textTransform:"uppercase", color:"var(--gold)", marginBottom:14 }}>{col.title}</div>
+                {col.links.map(l => (
+                  <a key={l} href="#" style={{ display:"block", fontSize:12, color:"rgba(255,255,255,.4)", textDecoration:"none", marginBottom:8, transition:"color .2s ease" }}
+                    onMouseEnter={e => (e.currentTarget.style.color = "#fff")} onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,.4)")}>{l}</a>
+                ))}
               </div>
             ))}
           </div>
-          <div className="border-t border-[var(--border)] pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-[12px] text-[var(--muted)]">© 2026 DocVault. All rights reserved.</p>
-            <p className="text-[12px] text-[var(--muted)]">Built with security first · HIPAA-conscious architecture</p>
+          <div style={{ borderTop:"1px solid rgba(255,255,255,.07)", paddingTop:20, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+            <p style={{ fontSize:11, color:"rgba(255,255,255,.3)" }}>© 2026 DocVault. All rights reserved.</p>
+            <p style={{ fontSize:11, color:"rgba(255,255,255,.3)" }}>Instant downloads · Secure checkout · Free updates</p>
           </div>
         </div>
       </footer>
+
+      {/* MODAL */}
+      {modal && (
+        <div className="modal-overlay" onClick={() => setModal(null)}>
+          <div className="modal-box" onClick={e => e.stopPropagation()}>
+            <div style={{ height:140, background:"var(--sand)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:64, position:"relative" }}>
+              {modal.icon}
+              <button onClick={() => setModal(null)} style={{ position:"absolute", top:12, right:14, background:"rgba(0,0,0,.2)", border:"none", color:"#fff", width:28, height:28, borderRadius:"50%", cursor:"pointer", fontSize:14 }}>✕</button>
+            </div>
+            <div style={{ padding:28 }}>
+              <div style={{ fontSize:10, fontWeight:700, letterSpacing:"2px", textTransform:"uppercase", color:"var(--gold)", marginBottom:8 }}>{modal.niche}</div>
+              <div className="serif" style={{ fontSize:22, fontWeight:700, marginBottom:10, lineHeight:1.2 }}>{modal.title}</div>
+              <p style={{ fontSize:13, color:"var(--muted)", lineHeight:1.7, marginBottom:18 }}>{modal.desc}</p>
+              <div style={{ background:"var(--sand)", borderRadius:8, padding:14, marginBottom:20 }}>
+                <div style={{ fontSize:10, fontWeight:700, letterSpacing:"2px", textTransform:"uppercase", color:"var(--muted)", marginBottom:10 }}>File formats included</div>
+                <div style={{ display:"flex", gap:8 }}>
+                  {modal.formats.map(f => <span key={f} style={{ fontSize:11, background:"#fff", color:"var(--ink)", padding:"4px 10px", borderRadius:2, fontWeight:500 }}>{f}</span>)}
+                </div>
+              </div>
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+                <div>
+                  <div className="serif" style={{ fontSize:36, fontWeight:700 }}>${modal.price}</div>
+                  <div style={{ fontSize:11, color:"var(--muted)" }}>Instant download · Editable</div>
+                </div>
+                <a href={modal.gumroad} className="btn-gold" style={{ background:"var(--gold)", color:"#fff", border:"none", padding:"13px 24px", borderRadius:8, fontSize:14, fontWeight:600, cursor:"pointer", textDecoration:"none" }}>Buy Now →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
