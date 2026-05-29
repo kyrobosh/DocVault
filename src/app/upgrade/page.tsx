@@ -83,7 +83,7 @@ export default function UpgradePage() {
 
         {/* Compare */}
         <div style={{ background:"#fff", border:"1px solid #e8e0d0", borderRadius:12, padding:24, marginBottom:32 }}>
-          <h3 style={{ fontSize:14, fontWeight:600, marginBottom:16, color:"#7a7060", textTransform:"uppercase", letterSpacing:"1px", fontSize:11 }}>What's included in both plans</h3>
+          <h3 style={{ fontSize:11, fontWeight:600, marginBottom:16, color:"#7a7060", textTransform:"uppercase", letterSpacing:"1px" }}>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16 }}>
             {[
               { icon:"📄", label:"250+ Templates", desc:"Contracts, estimates, checklists, spreadsheets" },
