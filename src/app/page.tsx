@@ -1,20 +1,81 @@
 "use client";
 import { useState, useEffect } from "react";
 import { addToCart, CartItem } from "@/lib/cart-store";
+import Image from "next/image";
 
-const PRODUCTS: CartItem[] = [
-  { id:1, title:"Roofing Job Estimate Spreadsheet", niche:"Roofing", icon:"🏠", price:27, formats:"Excel + Google Sheets", gumroad:"https://gumroad.com/l/your-link-1" },
-  { id:2, title:"Move-In / Move-Out Checklist", niche:"Property Management", icon:"🏢", price:19, formats:"Word + Google Docs", gumroad:"https://gumroad.com/l/your-link-2" },
-  { id:3, title:"Wedding Photography Contract", niche:"Photography", icon:"📸", price:37, formats:"Word + Google Docs", gumroad:"https://gumroad.com/l/your-link-3" },
-  { id:4, title:"12-Week Program Builder", niche:"Personal Training", icon:"💪", price:27, formats:"Excel + Google Sheets", gumroad:"https://gumroad.com/l/your-link-4" },
-  { id:5, title:"Freelance Service Agreement", niche:"Legal", icon:"⚖️", price:29, formats:"Word + Google Docs", gumroad:"https://gumroad.com/l/your-link-5" },
-  { id:6, title:"Monthly Cash Flow Tracker", niche:"Finance", icon:"💰", price:24, formats:"Excel + Google Sheets", gumroad:"https://gumroad.com/l/your-link-6" },
-  { id:7, title:"Employee Onboarding Checklist", niche:"HR", icon:"👥", price:22, formats:"Word + Google Docs", gumroad:"https://gumroad.com/l/your-link-7" },
-  { id:8, title:"Subcontractor Agreement", niche:"Contractors", icon:"🔧", price:34, formats:"Word + Google Docs", gumroad:"https://gumroad.com/l/your-link-8" },
-  { id:9, title:"Lease Violation Notice Pack", niche:"Property Management", icon:"🏢", price:22, formats:"Word + Google Docs", gumroad:"https://gumroad.com/l/your-link-9" },
-  { id:10, title:"PT Liability Waiver", niche:"Personal Training", icon:"💪", price:17, formats:"Word + Google Docs", gumroad:"https://gumroad.com/l/your-link-10" },
-  { id:11, title:"Safety Inspection Checklist", niche:"Roofing", icon:"🏠", price:19, formats:"Word + Google Docs", gumroad:"https://gumroad.com/l/your-link-11" },
-  { id:12, title:"Invoice & Receipt Template", niche:"Finance", icon:"💰", price:15, formats:"Word + Excel", gumroad:"https://gumroad.com/l/your-link-12" },
+const PRODUCTS: (CartItem & { preview: string; includes: string[] })[] = [
+  {
+    id:1, title:"Roofing Job Estimate Spreadsheet", niche:"Roofing", icon:"🏠", price:27,
+    formats:"Excel + Google Sheets", gumroad:"https://gumroad.com/l/your-link-1",
+    preview:"/previews/roofing_estimate-1.jpg",
+    includes:["Material cost calculator by sq/ft","Labor hours & rate breakdown","Profit margin tracker","Client-ready print view","How to Use tab included"],
+  },
+  {
+    id:2, title:"Move-In / Move-Out Checklist", niche:"Property Management", icon:"🏢", price:19,
+    formats:"Word + Google Docs", gumroad:"https://gumroad.com/l/your-link-2",
+    preview:"/previews/move_in_out_checklist-1.jpg",
+    includes:["Room-by-room condition tracking","Photo attachment slots","Tenant & landlord signature fields","Keys & items received log","State-agnostic legal language"],
+  },
+  {
+    id:3, title:"Wedding Photography Contract", niche:"Photography", icon:"📸", price:37,
+    formats:"Word + Google Docs", gumroad:"https://gumroad.com/l/your-link-3",
+    preview:"/previews/photography_contract-1.jpg",
+    includes:["9 professional clauses","Payment schedule & late fees","Cancellation policy","IP & usage rights","Delivery timeline terms"],
+  },
+  {
+    id:4, title:"12-Week Program Builder", niche:"Personal Training", icon:"💪", price:27,
+    formats:"Excel + Google Sheets", gumroad:"https://gumroad.com/l/your-link-4",
+    preview:"/previews/pt_12week_program-01.jpg",
+    includes:["3 training phases (weeks 1–12)","Client profile & intake form","Sets, reps & rest columns","Progress tracker tab","Printer-friendly client view"],
+  },
+  {
+    id:5, title:"Freelance Service Agreement", niche:"Legal", icon:"⚖️", price:29,
+    formats:"Word + Google Docs", gumroad:"https://gumroad.com/l/your-link-5",
+    preview:"/previews/freelance_service_agreement-1.jpg",
+    includes:["Scope of work definition","Payment terms & kill fee","IP ownership clause","Termination provisions","Revision policy section"],
+  },
+  {
+    id:6, title:"Monthly Cash Flow Tracker", niche:"Finance", icon:"💰", price:24,
+    formats:"Excel + Google Sheets", gumroad:"https://gumroad.com/l/your-link-6",
+    preview:"/previews/cashflow_tracker-1.jpg",
+    includes:["12-month income & expense tracker","Auto-calculating totals","Break-even calculator tab","Annual summary dashboard","Year-over-year comparison"],
+  },
+  {
+    id:7, title:"Employee Onboarding Checklist", niche:"HR", icon:"👥", price:22,
+    formats:"Word + Google Docs", gumroad:"https://gumroad.com/l/your-link-7",
+    preview:"/previews/employee_onboarding_checklist-1.jpg",
+    includes:["Pre-start checklist for managers","Day 1 schedule template","Week 1 & 30-day milestones","IT & tools setup tracker","Manager & employee signatures"],
+  },
+  {
+    id:8, title:"Subcontractor Agreement", niche:"Contractors", icon:"🔧", price:34,
+    formats:"Word + Google Docs", gumroad:"https://gumroad.com/l/your-link-8",
+    preview:"/previews/subcontractor_agreement-1.jpg",
+    includes:["Scope of work & deliverables","Payment schedule & retention","Insurance requirements","Liability & indemnification","Lien waiver included"],
+  },
+  {
+    id:9, title:"Lease Violation Notice Pack", niche:"Property Management", icon:"🏢", price:22,
+    formats:"Word + Google Docs", gumroad:"https://gumroad.com/l/your-link-9",
+    preview:"/previews/lease_violation_notice_pack-1.jpg",
+    includes:["Noise/nuisance notice","Late rent / non-payment notice","General lease breach notice","Editable fields throughout","Ready to print and serve"],
+  },
+  {
+    id:10, title:"PT Liability Waiver", niche:"Personal Training", icon:"💪", price:17,
+    formats:"Word + Google Docs", gumroad:"https://gumroad.com/l/your-link-10",
+    preview:"/previews/pt_liability_waiver-1.jpg",
+    includes:["Health history disclosure","Risk acknowledgment section","Emergency contact fields","Photo/media consent","Trainer & client signatures"],
+  },
+  {
+    id:11, title:"NDA / Confidentiality Agreement", niche:"Legal", icon:"⚖️", price:24,
+    formats:"Word + Google Docs", gumroad:"https://gumroad.com/l/your-link-11",
+    preview:"/previews/nda_confidentiality_agreement-1.jpg",
+    includes:["Mutual & one-way versions","Definition of confidential info","Permitted disclosure exceptions","Term & termination clause","Governing law section"],
+  },
+  {
+    id:12, title:"Invoice & Receipt Template", niche:"Finance", icon:"💰", price:15,
+    formats:"Word + Excel", gumroad:"https://gumroad.com/l/your-link-12",
+    preview:"/previews/invoice_receipt_template-1.jpg",
+    includes:["Professional invoice layout","Auto-calculating line items","Tax & subtotal rows","Payment terms section","Matching receipt template"],
+  },
 ];
 
 const CATEGORIES = ["All","Roofing","Property Management","Photography","Personal Training","Legal","Finance","HR","Contractors"];
@@ -29,13 +90,15 @@ const BUNDLES = [
 export default function Home() {
   const [category, setCategory] = useState("All");
   const [search, setSearch] = useState("");
-  const [modal, setModal] = useState<CartItem | null>(null);
+  const [modal, setModal] = useState<typeof PRODUCTS[0] | null>(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [added, setAdded] = useState<number[]>([]);
 
   function handleAddToCart(item: CartItem) {
     addToCart(item);
     setAdded(prev => [...prev, item.id]);
     setTimeout(() => setAdded(prev => prev.filter(id => id !== item.id)), 2000);
+    window.dispatchEvent(new Event("cart-updated"));
   }
 
   function handleModalAdd(item: CartItem) {
@@ -69,6 +132,8 @@ export default function Home() {
         .btn-gold { transition: all .2s ease; }
         .btn-gold:hover { background: #b07830 !important; transform: translateY(-1px); }
         input:focus { outline: none; border-color: #c8923a !important; }
+        .preview-thumb:hover { opacity: 0.85; }
+        .preview-thumb { transition: opacity .2s ease; cursor: zoom-in; }
       `}</style>
 
       {/* HERO */}
@@ -92,7 +157,7 @@ export default function Home() {
             </a>
           </div>
           <div className="anim-4" style={{ display:"flex", gap:40 }}>
-            {[["250+","Templates"],["18","Industries"],["Instant","Download"],["Free","Updates"]].map(([n,l]) => (
+            {[["12","Templates"],["8","Industries"],["Instant","Download"],["Free","Updates"]].map(([n,l]) => (
               <div key={n}>
                 <div className="serif" style={{ fontSize:26, fontWeight:700 }}>{n}</div>
                 <div style={{ fontSize:11, color:"#7a7060", marginTop:2 }}>{l}</div>
@@ -101,24 +166,21 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="float" style={{ background:"#fff", borderRadius:16, padding:24, boxShadow:"0 20px 80px rgba(0,0,0,.1)", border:"1px solid #e8e0d0" }}>
-          <div style={{ fontSize:12, fontWeight:600, color:"#7a7060", marginBottom:16, letterSpacing:"1px", textTransform:"uppercase" }}>Popular This Week</div>
-          {PRODUCTS.slice(0,5).map((p,i) => (
-            <div key={i} style={{ display:"flex", alignItems:"center", gap:12, padding:"10px 0", borderBottom: i<4 ? "1px solid #f0ebe0" : "none" }}>
-              <div style={{ width:36, height:36, borderRadius:8, background:"#f0ebe0", display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, flexShrink:0 }}>{p.icon}</div>
-              <div style={{ flex:1, minWidth:0 }}>
-                <div style={{ fontSize:12, fontWeight:600, marginBottom:2, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{p.title}</div>
-                <div style={{ fontSize:10, color:"#7a7060" }}>{p.niche}</div>
-              </div>
-              <div className="serif" style={{ fontSize:18, fontWeight:700, color:"#c8923a", flexShrink:0 }}>${p.price}</div>
-            </div>
-          ))}
-          <div style={{ marginTop:16, padding:"12px 16px", background:"#f0ebe0", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+        {/* Hero visual — real preview */}
+        <div className="float" style={{ background:"#fff", borderRadius:16, overflow:"hidden", boxShadow:"0 20px 80px rgba(0,0,0,.12)", border:"1px solid #e8e0d0" }}>
+          <div style={{ padding:"16px 20px 12px", borderBottom:"1px solid #f0ebe0", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
             <div>
-              <div style={{ fontSize:12, fontWeight:600 }}>Full Access Pass</div>
-              <div style={{ fontSize:10, color:"#7a7060" }}>All 250+ templates</div>
+              <div style={{ fontSize:12, fontWeight:600, marginBottom:2 }}>Roofing Job Estimate</div>
+              <div style={{ fontSize:10, color:"#7a7060" }}>Excel + Google Sheets</div>
             </div>
-            <div className="serif" style={{ fontSize:20, fontWeight:700, color:"#b84c2a" }}>$29<span style={{ fontSize:11, color:"#7a7060" }}>/mo</span></div>
+            <div className="serif" style={{ fontSize:20, fontWeight:700, color:"#c8923a" }}>$27</div>
+          </div>
+          <div style={{ position:"relative", width:"100%", height:280, background:"#f0ebe0" }}>
+            <Image src="/previews/roofing_estimate-1.jpg" alt="Roofing Estimate Preview" fill style={{ objectFit:"cover", objectPosition:"top" }} />
+          </div>
+          <div style={{ padding:"12px 20px", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <span style={{ fontSize:11, color:"#7a7060" }}>Click any template to preview</span>
+            <button onClick={() => setModal(PRODUCTS[0])} style={{ background:"#c8923a", color:"#fff", border:"none", padding:"7px 14px", borderRadius:6, fontSize:12, fontWeight:600, cursor:"pointer" }}>Preview →</button>
           </div>
         </div>
       </section>
@@ -126,7 +188,7 @@ export default function Home() {
       {/* STATS */}
       <div style={{ background:"#1a1a18", padding:"20px 48px" }}>
         <div style={{ maxWidth:1200, margin:"0 auto", display:"flex", gap:48, justifyContent:"center", flexWrap:"wrap" }}>
-          {[["4,800+","Businesses served"],["⭐ 4.9","Average rating"],["250+","Ready-to-use templates"],["Instant","Delivery after payment"]].map(([n,l]) => (
+          {[["4,800+","Businesses served"],["⭐ 4.9","Average rating"],["12","Ready-to-use templates"],["Instant","Delivery after payment"]].map(([n,l]) => (
             <div key={n} style={{ textAlign:"center" }}>
               <div className="serif" style={{ fontSize:24, fontWeight:700, color:"#c8923a" }}>{n}</div>
               <div style={{ fontSize:11, color:"rgba(255,255,255,.5)", marginTop:2 }}>{l}</div>
@@ -157,17 +219,24 @@ export default function Home() {
           </div>
         </div>
 
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(270px,1fr))", gap:20 }}>
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))", gap:20 }}>
           {filtered.map(p => (
             <div key={p.id} className="pcard" style={{ background:"#fff", borderRadius:12, overflow:"hidden", border:"1px solid #e8e0d0" }}>
-              <div onClick={() => setModal(p)} style={{ height:120, background:"#f0ebe0", display:"flex", alignItems:"center", justifyContent:"center", fontSize:48, position:"relative" }}>
-                {p.icon}
+              {/* Preview image */}
+              <div onClick={() => setModal(p)} style={{ height:180, background:"#f0ebe0", position:"relative", overflow:"hidden" }}>
+                <Image src={p.preview} alt={p.title} fill style={{ objectFit:"cover", objectPosition:"top" }} />
+                <div style={{ position:"absolute", inset:0, background:"linear-gradient(to bottom, transparent 60%, rgba(0,0,0,.3))", display:"flex", alignItems:"flex-end", padding:"10px 12px" }}>
+                  <span style={{ fontSize:10, color:"#fff", fontWeight:600, background:"rgba(0,0,0,.4)", padding:"3px 8px", borderRadius:4 }}>Click to preview</span>
+                </div>
               </div>
               <div style={{ padding:18 }}>
                 <div style={{ fontSize:10, fontWeight:700, letterSpacing:"2px", textTransform:"uppercase", color:"#7a7060", marginBottom:6 }}>{p.niche}</div>
                 <div className="serif" onClick={() => setModal(p)} style={{ fontSize:17, fontWeight:700, marginBottom:14, lineHeight:1.3 }}>{p.title}</div>
                 <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-                  <div className="serif" style={{ fontSize:24, fontWeight:700 }}>${p.price}</div>
+                  <div>
+                    <div className="serif" style={{ fontSize:24, fontWeight:700 }}>${p.price}</div>
+                    <div style={{ fontSize:10, color:"#7a7060" }}>{p.formats}</div>
+                  </div>
                   <button onClick={() => handleAddToCart(p)} className="btn-gold"
                     style={{ background: added.includes(p.id) ? "#2a4a35" : "#c8923a", color:"#fff", border:"none", padding:"9px 16px", borderRadius:6, fontSize:12, fontWeight:600, cursor:"pointer", fontFamily:"'DM Sans',sans-serif" }}>
                     {added.includes(p.id) ? "✓ Added" : "Add to Cart"}
@@ -236,8 +305,8 @@ export default function Home() {
         <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:20, maxWidth:900, margin:"0 auto" }}>
           {[
             { name:"Pay Per Template", price:"$15–37", period:"per template", desc:"Buy exactly what you need.", features:["Instant download","Editable in Word/Excel","Free updates forever","Use across your business"], cta:"Browse templates", href:"#templates", highlight:false },
-            { name:"Full Access Pass", price:"$29", period:"per month", desc:"Unlimited access to everything.", features:["All 250+ templates","New templates monthly","Cancel anytime","Priority support","Commercial use license"], cta:"Get full access", href:"/register", highlight:true },
-            { name:"Lifetime Deal", price:"$149", period:"one time", desc:"Pay once, own it forever.", features:["All 250+ templates","All future templates","No subscription","Commercial use license","Priority support"], cta:"Get lifetime access", href:"/register", highlight:false },
+            { name:"Full Access Pass", price:"$29", period:"per month", desc:"Unlimited access to everything.", features:["All 12 templates instantly","New templates monthly","Cancel anytime","Priority support","Commercial use license"], cta:"Get full access", href:"/upgrade", highlight:true },
+            { name:"Lifetime Deal", price:"$149", period:"one time", desc:"Pay once, own it forever.", features:["All 12 templates instantly","All future templates free","No subscription","Commercial use license","Priority support"], cta:"Get lifetime access", href:"/upgrade", highlight:false },
           ].map(plan => (
             <div key={plan.name} style={{ borderRadius:12, padding:28, border: plan.highlight ? "2px solid #c8923a" : "1px solid #e8e0d0", background: plan.highlight ? "rgba(200,146,58,.04)" : "#fff", position:"relative" }}>
               {plan.highlight && <div style={{ position:"absolute", top:-12, left:"50%", transform:"translateX(-50%)", background:"#c8923a", color:"#fff", fontSize:10, fontWeight:700, padding:"4px 12px", borderRadius:999 }}>Most Popular</div>}
@@ -266,7 +335,7 @@ export default function Home() {
         </h2>
         <p style={{ fontSize:15, color:"#7a7060", marginBottom:32 }}>Join thousands of business owners who save hours every week with DocVault templates.</p>
         <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap" }}>
-          <a href="/register" className="btn-gold" style={{ background:"#1a1a18", color:"#fff", padding:"14px 32px", borderRadius:8, fontSize:14, fontWeight:600, textDecoration:"none" }}>Get full access — $29/mo</a>
+          <a href="/upgrade" className="btn-gold" style={{ background:"#1a1a18", color:"#fff", padding:"14px 32px", borderRadius:8, fontSize:14, fontWeight:600, textDecoration:"none" }}>Get full access — $29/mo</a>
           <a href="#templates" style={{ background:"#fff", color:"#1a1a18", padding:"14px 32px", borderRadius:8, fontSize:14, fontWeight:500, textDecoration:"none", border:"1.5px solid #e8e0d0" }}>Browse free first</a>
         </div>
         <p style={{ fontSize:11, color:"#7a7060", marginTop:16 }}>No credit card required to browse · Cancel anytime</p>
@@ -301,35 +370,69 @@ export default function Home() {
         </div>
       </footer>
 
-      {/* PRODUCT MODAL */}
+      {/* PRODUCT MODAL with preview */}
       {modal && (
-        <div onClick={() => setModal(null)} style={{ position:"fixed", inset:0, background:"rgba(26,26,24,.6)", zIndex:998, display:"flex", alignItems:"center", justifyContent:"center", padding:20, backdropFilter:"blur(4px)" }}>
-          <div onClick={e => e.stopPropagation()} style={{ background:"#fff", borderRadius:16, width:"100%", maxWidth:500, overflow:"hidden", animation:"fadeUp .25s ease" }}>
-            <div style={{ height:140, background:"#f0ebe0", display:"flex", alignItems:"center", justifyContent:"center", fontSize:64, position:"relative" }}>
-              {modal.icon}
-              <button onClick={() => setModal(null)} style={{ position:"absolute", top:12, right:14, background:"rgba(0,0,0,.15)", border:"none", color:"#1a1a18", width:28, height:28, borderRadius:"50%", cursor:"pointer", fontSize:14 }}>✕</button>
+        <div onClick={() => { setModal(null); setPreviewOpen(false); }} style={{ position:"fixed", inset:0, background:"rgba(26,26,24,.7)", zIndex:998, display:"flex", alignItems:"center", justifyContent:"center", padding:20, backdropFilter:"blur(4px)" }}>
+          <div onClick={e => e.stopPropagation()} style={{ background:"#fff", borderRadius:16, width:"100%", maxWidth:560, maxHeight:"90vh", overflowY:"auto", animation:"fadeUp .25s ease" }}>
+
+            {/* Preview image */}
+            <div onClick={() => setPreviewOpen(true)} className="preview-thumb" style={{ position:"relative", width:"100%", height:260, background:"#f0ebe0", borderRadius:"16px 16px 0 0", overflow:"hidden" }}>
+              <Image src={modal.preview} alt={modal.title} fill style={{ objectFit:"cover", objectPosition:"top" }} />
+              <div style={{ position:"absolute", inset:0, background:"linear-gradient(to bottom, transparent 50%, rgba(0,0,0,.5))", display:"flex", alignItems:"flex-end", padding:16 }}>
+                <span style={{ fontSize:12, color:"#fff", fontWeight:600, background:"rgba(0,0,0,.5)", padding:"5px 12px", borderRadius:6 }}>🔍 Click to see full preview</span>
+              </div>
+              <button onClick={e => { e.stopPropagation(); setModal(null); }} style={{ position:"absolute", top:12, right:14, background:"rgba(0,0,0,.4)", border:"none", color:"#fff", width:30, height:30, borderRadius:"50%", cursor:"pointer", fontSize:14 }}>✕</button>
             </div>
+
             <div style={{ padding:28 }}>
               <div style={{ fontSize:10, fontWeight:700, letterSpacing:"2px", textTransform:"uppercase", color:"#c8923a", marginBottom:8 }}>{modal.niche}</div>
-              <div className="serif" style={{ fontSize:22, fontWeight:700, marginBottom:10, lineHeight:1.2 }}>{modal.title}</div>
-              <div style={{ background:"#f0ebe0", borderRadius:8, padding:14, marginBottom:20 }}>
-                <div style={{ fontSize:10, fontWeight:700, letterSpacing:"2px", textTransform:"uppercase", color:"#7a7060", marginBottom:8 }}>File formats included</div>
-                <div style={{ display:"flex", gap:8 }}>
-                  {modal.formats.split(" + ").map(f => <span key={f} style={{ fontSize:11, background:"#fff", color:"#1a1a18", padding:"4px 10px", borderRadius:2, fontWeight:500 }}>{f}</span>)}
+              <div className="serif" style={{ fontSize:24, fontWeight:700, marginBottom:10, lineHeight:1.2 }}>{modal.title}</div>
+
+              {/* What's included */}
+              <div style={{ background:"#f0ebe0", borderRadius:8, padding:16, marginBottom:20 }}>
+                <div style={{ fontSize:10, fontWeight:700, letterSpacing:"2px", textTransform:"uppercase", color:"#7a7060", marginBottom:10 }}>What's Included</div>
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6 }}>
+                  {modal.includes.map(item => (
+                    <div key={item} style={{ display:"flex", alignItems:"flex-start", gap:6, fontSize:12, color:"#1a1a18" }}>
+                      <span style={{ color:"#c8923a", fontWeight:700, flexShrink:0 }}>✓</span>
+                      {item}
+                    </div>
+                  ))}
                 </div>
               </div>
+
+              {/* Formats */}
+              <div style={{ display:"flex", gap:8, marginBottom:20 }}>
+                {modal.formats.split(" + ").map(f => (
+                  <span key={f} style={{ fontSize:11, background:"#f0ebe0", color:"#1a1a18", padding:"5px 12px", borderRadius:4, fontWeight:500 }}>{f}</span>
+                ))}
+                <span style={{ fontSize:11, background:"#e8f5e9", color:"#2a4a35", padding:"5px 12px", borderRadius:4, fontWeight:500 }}>✓ Instant Download</span>
+                <span style={{ fontSize:11, background:"#e8f5e9", color:"#2a4a35", padding:"5px 12px", borderRadius:4, fontWeight:500 }}>✓ Free Updates</span>
+              </div>
+
               <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
                 <div>
-                  <div className="serif" style={{ fontSize:36, fontWeight:700 }}>${modal.price}</div>
-                  <div style={{ fontSize:11, color:"#7a7060" }}>Instant download · Editable</div>
+                  <div className="serif" style={{ fontSize:38, fontWeight:700 }}>${modal.price}</div>
+                  <div style={{ fontSize:11, color:"#7a7060" }}>One-time purchase · Yours forever</div>
                 </div>
                 <button onClick={() => handleModalAdd(modal)} className="btn-gold"
-                  style={{ background:"#c8923a", color:"#fff", border:"none", padding:"13px 24px", borderRadius:8, fontSize:14, fontWeight:600, cursor:"pointer", fontFamily:"'DM Sans',sans-serif" }}>
+                  style={{ background:"#c8923a", color:"#fff", border:"none", padding:"14px 28px", borderRadius:8, fontSize:14, fontWeight:700, cursor:"pointer", fontFamily:"'DM Sans',sans-serif" }}>
                   Add to Cart →
                 </button>
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* FULL PREVIEW LIGHTBOX */}
+      {previewOpen && modal && (
+        <div onClick={() => setPreviewOpen(false)} style={{ position:"fixed", inset:0, background:"rgba(0,0,0,.92)", zIndex:999, display:"flex", alignItems:"center", justifyContent:"center", padding:20, cursor:"zoom-out" }}>
+          <button onClick={() => setPreviewOpen(false)} style={{ position:"absolute", top:20, right:20, background:"rgba(255,255,255,.15)", border:"none", color:"#fff", width:40, height:40, borderRadius:"50%", cursor:"pointer", fontSize:18 }}>✕</button>
+          <div style={{ position:"relative", maxWidth:"90vw", maxHeight:"90vh", width:700 }}>
+            <Image src={modal.preview} alt={modal.title} width={700} height={900} style={{ objectFit:"contain", borderRadius:8, maxHeight:"85vh", width:"auto" }} />
+          </div>
+          <div style={{ position:"absolute", bottom:20, left:"50%", transform:"translateX(-50%)", color:"rgba(255,255,255,.6)", fontSize:12 }}>Click anywhere to close</div>
         </div>
       )}
     </main>

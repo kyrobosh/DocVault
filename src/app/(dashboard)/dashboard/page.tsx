@@ -139,8 +139,8 @@ export default function DashboardPage() {
               <p style={{ fontSize:13, color:"rgba(255,255,255,.5)", maxWidth:460 }}>Get instant access to every template — contracts, estimates, checklists, spreadsheets and more. New templates added monthly.</p>
             </div>
             <div style={{ display:"flex", gap:10, flexShrink:0 }}>
-              <Link href="/register" style={{ background:"#c8923a", color:"#fff", padding:"12px 24px", borderRadius:8, fontSize:13, fontWeight:600, textDecoration:"none", whiteSpace:"nowrap" }}>Full Access — $29/mo</Link>
-              <Link href="/register" style={{ background:"rgba(255,255,255,.08)", color:"#fff", padding:"12px 24px", borderRadius:8, fontSize:13, fontWeight:500, textDecoration:"none", whiteSpace:"nowrap" }}>Lifetime — $149</Link>
+              <Link href="/upgrade" style={{ background:"#c8923a", color:"#fff", padding:"12px 24px", borderRadius:8, fontSize:13, fontWeight:600, textDecoration:"none", whiteSpace:"nowrap" }}>Full Access — $29/mo</Link>
+              <Link href="/upgrade" style={{ background:"rgba(255,255,255,.08)", color:"#fff", padding:"12px 24px", borderRadius:8, fontSize:13, fontWeight:500, textDecoration:"none", whiteSpace:"nowrap" }}>Lifetime — $149</Link>
             </div>
           </div>
         )}
