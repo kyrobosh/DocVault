@@ -17,6 +17,7 @@ export default function UpgradePage() {
       `}</style>
 
       <div style={{ maxWidth:860, margin:"0 auto", padding:"64px 24px" }}>
+
         {/* Header */}
         <div style={{ textAlign:"center", marginBottom:56 }}>
           <div style={{ display:"inline-block", fontSize:11, fontWeight:600, letterSpacing:"2px", textTransform:"uppercase", color:"#c8923a", border:"1px solid #c8923a", padding:"4px 12px", borderRadius:2, marginBottom:16 }}>Upgrade</div>
@@ -39,17 +40,16 @@ export default function UpgradePage() {
               <span className="serif" style={{ fontSize:52, fontWeight:700, lineHeight:1 }}>$29</span>
               <span style={{ fontSize:13, color:"#7a7060" }}>/month</span>
             </div>
-            <p style={{ fontSize:13, color:"#7a7060", marginBottom:24, lineHeight:1.6 }}>Full access to all 250+ templates. Cancel anytime.</p>
+            <p style={{ fontSize:13, color:"#7a7060", marginBottom:24, lineHeight:1.6 }}>Full access to all templates. Cancel anytime.</p>
             <ul style={{ listStyle:"none", padding:0, marginBottom:28 }}>
-              {["All 250+ templates instantly","New templates added monthly","Cancel anytime","Commercial use license","Priority email support"].map(f => (
+              {["All 12 templates instantly","New templates added monthly","Cancel anytime","Commercial use license","Priority email support"].map(f => (
                 <li key={f} style={{ display:"flex", alignItems:"center", gap:8, fontSize:13, padding:"5px 0" }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c8923a" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                   <span style={{ color:"#7a7060" }}>{f}</span>
                 </li>
               ))}
             </ul>
-            {/* Replace this href with your Stripe monthly link */}
-            <a href="https://buy.stripe.com/your-monthly-link" className="btn"
+            <a href="#" onClick={e => { e.preventDefault(); alert("Payments launching soon! Check back shortly."); }} className="btn"
               style={{ display:"block", textAlign:"center", background:"#c8923a", color:"#fff", padding:"14px", borderRadius:8, fontSize:14, fontWeight:700, textDecoration:"none" }}>
               Get Full Access — $29/mo
             </a>
@@ -65,15 +65,14 @@ export default function UpgradePage() {
             </div>
             <p style={{ fontSize:13, color:"rgba(255,255,255,.5)", marginBottom:24, lineHeight:1.6 }}>Pay once, own it forever. Includes all future templates.</p>
             <ul style={{ listStyle:"none", padding:0, marginBottom:28 }}>
-              {["All 250+ templates instantly","All future templates free","No subscription ever","Commercial use license","Priority email support"].map(f => (
+              {["All 12 templates instantly","All future templates free","No subscription ever","Commercial use license","Priority email support"].map(f => (
                 <li key={f} style={{ display:"flex", alignItems:"center", gap:8, fontSize:13, padding:"5px 0" }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c8923a" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                   <span style={{ color:"rgba(255,255,255,.6)" }}>{f}</span>
                 </li>
               ))}
             </ul>
-            {/* Replace this href with your Stripe lifetime link */}
-            <a href="https://buy.stripe.com/your-lifetime-link" className="btn"
+            <a href="#" onClick={e => { e.preventDefault(); alert("Payments launching soon! Check back shortly."); }} className="btn"
               style={{ display:"block", textAlign:"center", background:"#c8923a", color:"#fff", padding:"14px", borderRadius:8, fontSize:14, fontWeight:700, textDecoration:"none" }}>
               Get Lifetime Access — $149
             </a>
@@ -84,9 +83,11 @@ export default function UpgradePage() {
         {/* Compare */}
         <div style={{ background:"#fff", border:"1px solid #e8e0d0", borderRadius:12, padding:24, marginBottom:32 }}>
           <h3 style={{ fontSize:11, fontWeight:600, marginBottom:16, color:"#7a7060", textTransform:"uppercase", letterSpacing:"1px" }}>
+            What is included in both plans
+          </h3>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16 }}>
             {[
-              { icon:"📄", label:"250+ Templates", desc:"Contracts, estimates, checklists, spreadsheets" },
+              { icon:"📄", label:"12 Templates", desc:"Contracts, estimates, checklists, spreadsheets" },
               { icon:"⚡", label:"Instant Download", desc:"Files delivered immediately after payment" },
               { icon:"✏️", label:"Fully Editable", desc:"Works in Word, Excel & Google Workspace" },
               { icon:"🔁", label:"Free Updates", desc:"Get every future update at no extra cost" },
@@ -108,6 +109,7 @@ export default function UpgradePage() {
         <div style={{ textAlign:"center" }}>
           <Link href="/dashboard" style={{ fontSize:13, color:"#7a7060", textDecoration:"none" }}>← Back to dashboard</Link>
         </div>
+
       </div>
     </div>
   );
