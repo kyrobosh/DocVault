@@ -3,6 +3,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { addToCart } from "@/lib/cart-store";
 
 const TEMPLATES = [
   { id:1, title:"Roofing Job Estimate Spreadsheet", niche:"Roofing", icon:"🏠", price:27, formats:"Excel + Google Sheets" },
@@ -165,7 +166,7 @@ export default function DashboardPage() {
                   {hasAccess ? (
                     <button style={{ background:"#2a4a35", color:"#fff", border:"none", padding:"8px 16px", borderRadius:6, fontSize:12, fontWeight:600, cursor:"pointer" }}>⬇ Download</button>
                   ) : (
-                    <Link href="/" style={{ background:"#c8923a", color:"#fff", padding:"8px 16px", borderRadius:6, fontSize:12, fontWeight:600, textDecoration:"none" }}>Buy →</Link>
+                    <button onClick={() => addToCart({...t, gumroad:"https://gumroad.com/l/your-link"})} style={{ background:"#c8923a", color:"#fff", border:"none", padding:"8px 16px", borderRadius:6, fontSize:12, fontWeight:600, cursor:"pointer", fontFamily:"'DM Sans',sans-serif" }}>Add to Cart</button>
                   )}
                 </div>
               </div>
